@@ -40,6 +40,12 @@ def acc(signals, ms, direction):
                 "eff_diss": eff_diss_h
             })
 
+
+
+
+
+  
+  
         if direction == "buy":
             num_signal = (signals.sum())
             tp = ((signals == 1) & (ms["波段低點區間"] == 1).values[:, None])
@@ -71,3 +77,11 @@ def acc(signals, ms, direction):
                 "fscore": fscore,
                 "eff_diss": eff_diss_l
             })
+        
+
+
+
+
+
+
+

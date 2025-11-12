@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>大盤多空綜合判斷系統 · Pro (Dynamic)</title>
+  <meta http-equiv="Cache-Control" content="no-store" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
+  <style>
+    :root{
+      --bg:#0b1020;
+      --panel:#0f172a;
+      --card:#0f172a;
+      --card2:#121a31;
+      --text:#e5e7eb;
+      --muted:#9ca3af;
+      --border:#1f2a44;
+      --accent:#22c55e;
+      --accent-weak:#4ade80;
+      --danger:#ef4444;
+      --thead:#0b1226;
+      --chip:#0b1b33;
+    }
+    html,body{
+      background:radial-gradient(1200px 800px at 70% -10%, rgba(56,189,248,.10), transparent 60%),
+                 radial-gradient(1000px 700px at 0% 20%, rgba(34,197,94,.08), transparent 60%),
+                 var(--bg);
+      color:var(--text);
+    }
+
+    /* NAV */
+    .app-navbar{
+      backdrop-filter:saturate(180%) blur(10px);
+      background:linear-gradient(90deg,#0b1020, #0f172a 40%, #0b1020);
+      border-bottom:1px solid var(--border);
+    }
+    .brand{font-weight:800; letter-spacing:.5px;}
+    .brand .dot{color:var(--accent)}
+    .nav-kpis{display:flex; gap:12px; align-items:center}
+    .kpi{font-variant-numeric:tabular-nums; padding:6px 10px; border-radius:10px; background:var(--chip); border:1px solid var(--border); color:var(--muted);}
+
+    .app-wrap{max-width:1200px; margin:24px auto 40px; padding:0 16px;}
+
+    /* CARDS */
+    .card-elev{
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0));
+      border:1px solid var(--border);
+      border-radius:16px;
+      box-shadow:0 10px 30px rgba(0,0,0,.30);
+    }
+    .card-elev .card-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:14px}
+    .card-title{font-weight:700; margin:0; font-size:1.1rem}
+    .sub-title{color:var(--muted); font-size:.95rem; margin:2px 0 14px 0;}
+
+    .plot-img{width:100%; height:auto; border:1px solid var(--border); border-radius:12px; background:#000; padding:6px;}
+
+    /* ===== TABLES ===== */
+    .table-wrap{max-height:480px; overflow:auto; border:1px solid var(--border); border-radius:12px; background:var(--card2);}    
+    table{margin:0; background:transparent; border-collapse:separate; border-spacing:0; table-layout:auto;}
+
+    .table > thead > tr > th{
+      position:sticky; top:0; z-index:2;
+      background:var(--thead)!important;
+      border-bottom:1px solid var(--border)!important;
+      color:#e5e7eb !important;
+    }
+
+    .table > :not(caption) > * > *{
+      color:#111827 !important;
+      background-color:#e5e8f0 !important;
+      padding:.5rem .7rem;
+      border-color:var(--border);
+      font-variant-numeric:tabular-nums;
+    }
+
+    .table > tbody > tr > th[scope="row"]{
+      position:sticky; left:0; z-index:3;
+      background-color:#cbd5e1 !important;
+      color:#111827 !important;
+      white-space:nowrap;
+      border-right:1px solid var(--border);
+    }
+
+    .num{text-align:right; font-variant-numeric:tabular-nums;}
+    .neg{color:var(--danger) !important;}
+    .pos{color:var(--accent-weak) !important;}
+
+    .skeleton{
+      height:180px; border-radius:10px;
+      background:linear-gradient(90deg,#0e172c 25%,#101b33 37%,#0e172c 63%);
+      background-size:400% 100%; animation:sheen 1.2s infinite; border:1px solid var(--border);
+    }
+    @keyframes sheen{0%{background-position:100% 0}100%{background-position:0 0}}
+
+    .nav-tabs{border-bottom:0}
+    .nav-tabs .nav-link{border:0; color:var(--muted);}    
+    .nav-tabs .nav-link.active{color:var(--accent); font-weight:700; border-bottom:2px solid var(--accent); background:transparent;}
+
+    .btn-outline-secondary{border-color:var(--border); color:var(--text)}
+    .btn-outline-secondary:hover{background:#12203c; border-color:#2a3a64}
+
+    .toolbar{display:flex; gap:8px; align-items:center}
+    .toolbar .decimals{width:86px}
+
+    footer{ color:var(--muted); font-size:.9rem; }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar app-navbar py-2">
+    <div class="container-fluid" style="max-width:1200px">
+      <div class="d-flex align-items-center gap-3">
+        <div class="brand h4 mb-0">
+          CI Market<span class="dot">•</span> 大盤多空綜合判斷系統
+          <span class="badge text-bg-success ms-2">Market: <span id="marketBadge"></span></span>
+        </div>
+        <div class="nav-kpis d-none d-md-flex">
+          <div class="kpi"><i class="bi bi-graph-up-arrow me-1"></i>Buy 指標</div>
+          <div class="kpi"><i class="bi bi-graph-down-arrow me-1"></i>Sell 指標</div>
+        </div>
+
+        <!-- 工具列 -->
+        <div class="ms-auto d-flex align-items-center gap-3 toolbar">
+          <label class="text-nowrap me-1" for="decimalSelect" style="color:var(--muted)">小數位</label>
+          <select id="decimalSelect" class="form-select form-select-sm decimals bg-dark text-light border-secondary">
+            <option value="0">0</option><option value="1">1</option>
+            <option value="2" selected>2</option><option value="3">3</option><option value="4">4</option>
+          </select>
+          <button class="btn btn-outline-secondary btn-sm" id="applyDecimals"><i class="bi bi-check2"></i> 套用</button>
+
+          <!-- 🌏 市場下拉（自動偵測） -->
+          <div class="dropdown">
+            <button class="btn btn-outline-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown" id="marketDropdownBtn">
+              🌏 市場：<span id="marketDropdownLabel"></span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" id="marketDropdown">
+              <li class="px-3 py-2 text-muted">偵測中…</li>
+            </ul>
+          </div>
+
+          <div class="dropdown">
+            <button class="btn btn-outline-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+              <i class="bi bi-download"></i> 下載 CSV
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" id="downloadMenu">
+              <li class="px-3 py-2 text-muted">載入中…</li>
+            </ul>
+          </div>
+
+          <button class="btn btn-success btn-sm" onclick="exportCurrentHTML()">
+            <i class="bi bi-filetype-html"></i> 匯出整頁 HTML
+          </button>
+        </div>
+      </div>
+
+      <div class="container-fluid" style="max-width:1200px">
+        <ul class="nav nav-tabs ms-auto mt-2">
+          <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-buy">Buy</button></li>
+          <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-sell">Sell</button></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <main class="app-wrap">
+    <div class="tab-content">
+
+      <!-- BUY -->
+      <div class="tab-pane fade show active" id="tab-buy">
+        <div class="card-elev p-4 mb-3">
+          <div class="card-head">
+            <h2 class="card-title">Buy 概覽</h2>
+            <span class="badge rounded-pill text-bg-dark border" style="border-color:var(--border)!important">情境圖</span>
+          </div>
+          <img class="plot-img" id="plot_buy" alt="Buy Plot">
+        </div>
+
+        <div class="card-elev p-4 mb-3">
+          <h5 class="mb-2"><i class="bi bi-kanban me-2"></i>Buy · Main Chart</h5>
+          <div class="sub-title">表頭日期自動格式化為 <code>YYYY-MM-DD</code>，數值依設定小數位四捨五入。</div>
+          <div class="table-wrap" id="main_chart_buy"><div class="skeleton"></div></div>
+        </div>
+
+        <!-- Subindex 動態容器 -->
+        <div id="sub_buy_container"></div>
+      </div>
+
+      <!-- SELL -->
+      <div class="tab-pane fade" id="tab-sell">
+        <div class="card-elev p-4 mb-3">
+          <div class="card-head">
+            <h2 class="card-title">Sell 概覽</h2>
+            <span class="badge rounded-pill text-bg-dark border" style="border-color:var(--border)!important">情境圖</span>
+          </div>
+          <img class="plot-img" id="plot_sell" alt="Sell Plot">
+        </div>
+
+        <div class="card-elev p-4 mb-3">
+          <h5 class="mb-2"><i class="bi bi-kanban me-2"></i>Sell · Main Chart</h5>
+          <div class="sub-title">表頭日期自動格式化為 <code>YYYY-MM-DD</code>，數值依設定小數位四捨五入。</div>
+          <div class="table-wrap" id="main_chart_sell"><div class="skeleton"></div></div>
+        </div>
+
+        <!-- Subindex 動態容器 -->
+        <div id="sub_sell_container"></div>
+      </div>
+    </div>
+
+    <footer class="mt-4 text-center">
+      © CI Market · Professional Edition
+    </footer>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // ========== GitHub 設定 ==========
+    const GH = {
+      owner: 'alfred0427',
+      repo: 'ci_index_web',
+      branch: 'main'
+    };
+
+    // ===== Lite 多市場：從 URL 取得市場參數 =====
+    function qp(k, d=""){ const u=new URL(location.href); return u.searchParams.get(k)||d; }
+    const MARKET = qp('market','TW'); // 預設 TW，可用 ?market=US 切換
+    const PATHS = {
+      buy: `${MARKET}_buy_data`,
+      sell: `${MARKET}_sell_data`
+    };
+
+    // ========== 全域設定 ==========
+    let DECIMALS = 2; // 預設四捨五入到小數點後 2 位
+    document.getElementById('applyDecimals').addEventListener('click', ()=>{
+      const sel = document.getElementById('decimalSelect');
+      DECIMALS = Math.max(0, Math.min(8, parseInt(sel.value,10) || 2));
+      reloadAll();
+    });
+
+    // ========== 工具：GitHub API 讀取資料夾內容 ==========
+    async function listGitHubDir(path=''){
+      const base = `https://api.github.com/repos/${GH.owner}/${GH.repo}/contents`;
+      const url  = path ? `${base}/${path}?ref=${GH.branch}` : `${base}?ref=${GH.branch}`;
+      const res = await fetch(url, {cache:'no-store'});
+      if (!res.ok) throw new Error(`GitHub API 讀取失敗: ${res.status}`);
+      return await res.json(); // array of {name, path, type, download_url}
+    }
+
+    const rawUrl = (path)=> `https://raw.githubusercontent.com/${GH.owner}/${GH.repo}/${GH.branch}/${path}`;
+
+    // ========== 載入 CSV → 表格 ==========
+    function loadCSV(path, mountId) {
+      const host = document.getElementById(mountId);
+      host.innerHTML = '<div class="skeleton"></div>';
+      Papa.parse(path + '?v=' + Date.now(), {
+        download: true,
+        header: false,
+        skipEmptyLines: true,
+        complete: ({ data }) => {
+          if (!data || !data.length) return showErr(mountId, `讀到空資料：${path}`);
+          let html = "<table class='table table-hover table-sm align-middle mb-0'><thead><tr>";
+          data[0].forEach((v, i) => html += i ? `<th>${escapeHtml(v)}</th>` : "<th></th>");
+          html += "</tr></thead><tbody>";
+          for (let r = 1; r < data.length; r++) {
+            html += "<tr>";
+            data[r].forEach((v, c) => {
+              const cell = escapeHtml(v);
+              html += (c === 0) ? `<th scope="row">${cell}</th>` : `<td>${cell}</td>`;
+            });
+            html += "</tr>";
+          }
+          html += "</tbody></table>";
+          host.innerHTML = html;
+          postProcessTable(host.querySelector('table'));
+        },
+        error: (err) => {
+          showErr(mountId, `無法讀取 ${path}：${err?.message}`);
+        }
+      });
+    }
+
+    // ========== 表頭轉 YYYY-MM-DD 與數值格式化 ==========
+    function formatHeaderDates(tbl){
+      const headRow = tbl.tHead?.rows?.[0];
+      if (!headRow) return;
+      for (let i = 1; i < headRow.cells.length; i++){
+        const th = headRow.cells[i];
+        const raw = th.textContent || '';
+        const m = raw.match(/(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/);
+        if (m){
+          const [ , y, mo, d ] = m;
+          th.textContent = `${y}-${String(mo).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        } else if (/^\d{4}-\d{2}-\d{2}T/.test(raw)) {
+          th.textContent = raw.slice(0,10);
+        }
+      }
+    }
+
+    function parseNumericText(s){
+      if (s == null) return { ok:false };
+      let raw = String(s).trim();
+      const hadPercent = /%$/.test(raw);
+      const isParenNeg = /^\(.*\)$/.test(raw);
+      raw = raw.replace(/[,%\s]/g,'');
+      raw = raw.replace(/%$/,'');
+      if (isParenNeg) raw = '-' + raw.slice(1,-1);
+      const n = Number(raw);
+      if (Number.isFinite(n)) return { ok:true, value:n, hadPercent };
+      return { ok:false };
+    }
+
+    const roundTo = (n,d)=> Math.round((n + Number.EPSILON) * Math.pow(10,d)) / Math.pow(10,d);
+
+    function postProcessTable(tbl){
+      const rows = Array.from(tbl.tBodies[0]?.rows || []);
+      if (!rows.length) return;
+      formatHeaderDates(tbl);
+
+      for (const tr of rows){
+        for (let c=1; c<tr.cells.length; c++){
+          const td = tr.cells[c];
+          const parsed = parseNumericText(td.textContent);
+          if (parsed.ok){
+            const rounded = roundTo(parsed.value, DECIMALS);
+            td.textContent = rounded.toFixed(DECIMALS) + (parsed.hadPercent ? '%' : '');
+            td.classList.add('num');
+            if (rounded < 0) td.classList.add('neg');
+            if (rounded > 0) td.classList.add('pos');
+          }
+        }
+      }
+    }
+
+    function showErr(mountId, msg) {
+      document.getElementById(mountId).innerHTML = `<div class="alert alert-danger">⚠️ ${escapeHtml(msg)}</div>`;
+    }
+    function escapeHtml(s){return String(s ?? '').replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");}
+
+    // ========== 動態渲染：Buy / Sell ==========
+    async function renderSide(side){
+      const path = PATHS[side];
+      // 圖片
+      document.getElementById(`plot_${side}`).src = rawUrl(`${path}/plot.png`) + `?v=${Date.now()}`;
+
+      // 列出資料夾
+      let items = await listGitHubDir(path);
+      items = items.filter(x => x.type === 'file' && x.name.endsWith('.csv'));
+
+      // main_chart.csv
+      const main = items.find(x => x.name.toLowerCase() === 'main_chart.csv');
+      if (main){
+        loadCSV(rawUrl(main.path), `main_chart_${side}`);
+      } else {
+        showErr(`main_chart_${side}`, '找不到 main_chart.csv');
+      }
+
+      // sub_*.csv（依檔名排序）
+      const subs = items.filter(x => /^sub_.*\.csv$/i.test(x.name)).sort((a,b)=> a.name.localeCompare(b.name,'zh-Hant'));
+
+      // 下載選單項目
+      appendDownloadMenu(side, main, subs);
+
+      // 產卡片 & 表格
+      const container = document.getElementById(`sub_${side}_container`);
+      container.innerHTML = '';
+      for (const file of subs){
+        const niceName = file.name.replace(/^sub_/i,'').replace(/\.csv$/i,'');
+        const card = document.createElement('div');
+        card.className = 'card-elev p-4 mb-3';
+        card.innerHTML = `
+          <h5 class="mb-2"><i class="bi bi-list-check me-2"></i>${escapeHtml(side[0].toUpperCase()+side.slice(1))} · ${escapeHtml(niceName)}</h5>
+          <div class="table-wrap" id="${side}_${niceName}"><div class="skeleton"></div></div>
+        `;
+        container.appendChild(card);
+        loadCSV(rawUrl(file.path), `${side}_${niceName}`);
+      }
+    }
+
+    function appendDownloadMenu(side, main, subs){
+      const menu = document.getElementById('downloadMenu');
+      if (!appendDownloadMenu.once){ menu.innerHTML = ''; appendDownloadMenu.once = true; }
+
+      const title = (txt)=> `<li><h6 class="dropdown-header">${escapeHtml(txt)} (${MARKET})</h6></li>`;
+      const item = (path, label)=> `<li><a class="dropdown-item" href="${rawUrl(path)}" download>${escapeHtml(label)}</a></li>`;
+      const divider = '<li><hr class="dropdown-divider"></li>';
+
+      // 動態 block（Buy 或 Sell）
+      const sideName = side[0].toUpperCase() + side.slice(1);
+      menu.insertAdjacentHTML('beforeend', title(sideName));
+      if (main) menu.insertAdjacentHTML('beforeend', item(main.path, 'main_chart.csv'));
+      for (const s of subs){ menu.insertAdjacentHTML('beforeend', item(s.path, s.name)); }
+      menu.insertAdjacentHTML('beforeend', divider);
+
+      // ZIP 全下載按鈕（會動態抓兩邊）
+      const zipBtnId = 'zipAllBtn';
+      if (!document.getElementById(zipBtnId)){
+        const li = document.createElement('li');
+        const btn = document.createElement('button');
+        btn.className = 'dropdown-item';
+        btn.id = zipBtnId; btn.textContent = '下載全部（zip）';
+        btn.onclick = downloadAllCSVs;
+        li.appendChild(btn); menu.appendChild(li);
+      }
+    }
+
+    async function downloadAllCSVs(){
+      const zip = new JSZip();
+      const all = [];
+      for (const side of ['buy','sell']){
+        const path = PATHS[side];
+        const items = (await listGitHubDir(path)).filter(x => x.type==='file' && x.name.endsWith('.csv'));
+        for (const x of items){
+          all.push({ url: rawUrl(x.path), name: `${MARKET}_${side}_${x.name}` });
+        }
+      }
+      await Promise.all(all.map(async f=>{
+        const res = await fetch(f.url, {cache:'no-store'});
+        const text = await res.text();
+        zip.file(f.name, text);
+      }));
+      const blob = await zip.generateAsync({type:'blob'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `${MARKET}_all_csv.zip`; a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    // 匯出目前整頁為 HTML
+    function exportCurrentHTML(){
+      const html = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+      const blob = new Blob([html], {type:"text/html;charset=utf-8"});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'export.html'; a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    // 重新載入所有表格
+    function reloadAll(){
+      renderSide('buy');
+      renderSide('sell');
+    }
+
+    // ===== 自動偵測市場並建立下拉選單 =====
+    async function buildMarketMenu(){
+      const lbl = document.getElementById('marketDropdownLabel');
+      if (lbl) lbl.textContent = MARKET;
+
+      const menu = document.getElementById('marketDropdown');
+      if (!menu) return;
+      menu.innerHTML = '<li class="px-3 py-2 text-muted">偵測中…</li>';
+
+      try {
+        const root = await listGitHubDir(''); // 讀 repo 根目錄
+        const buys  = new Set(root.filter(x => x.type==='dir' && /_buy_data$/i.test(x.name))
+                              .map(x => x.name.replace(/_buy_data$/i,'')));
+        const sells = new Set(root.filter(x => x.type==='dir' && /_sell_data$/i.test(x.name))
+                              .map(x => x.name.replace(/_sell_data$/i,'')));
+
+        const markets = [...buys].filter(m => sells.has(m)).sort();
+
+        menu.innerHTML = '';
+        if (!markets.length){
+          menu.innerHTML = '<li class="px-3 py-2 text-danger">找不到市場資料夾</li>';
+          return;
+        }
+        for (const m of markets){
+          menu.insertAdjacentHTML(
+            'beforeend',
+            `<li><a class="dropdown-item ${m===MARKET?'active':''}" href="#" data-m="${m}">${m}</a></li>`
+          );
+        }
+
+        menu.addEventListener('click', (e)=>{
+          const a = e.target.closest('a[data-m]');
+          if (!a) return;
+          e.preventDefault();
+          const m = a.getAttribute('data-m');
+          if (m && m !== MARKET){
+            const u = new URL(location.href);
+            u.searchParams.set('market', m);
+            location.href = u.toString();
+          }
+        });
+      } catch (err){
+        menu.innerHTML = `<li class="px-3 py-2 text-danger">偵測失敗：${escapeHtml(String(err?.message||err))}</li>`;
+      }
+    }
+
+    // 初始載入
+    (function init(){
+      const badge = document.getElementById('marketBadge');
+      if (badge) badge.textContent = MARKET;
+
+      // 圖片
+      document.getElementById('plot_buy').src  = rawUrl(`${PATHS.buy}/plot.png`) + `?v=${Date.now()}`;
+      document.getElementById('plot_sell').src = rawUrl(`${PATHS.sell}/plot.png`) + `?v=${Date.now()}`;
+
+      buildMarketMenu();  // ← 自動偵測市場並建立下拉
+      reloadAll();
+    })();
+  </script>
+</body>
+</html>
