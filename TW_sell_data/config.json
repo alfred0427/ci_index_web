@@ -1,0 +1,55 @@
+{
+  "market": "TW",
+  "direction": "sell",
+  "mea": "fscore",
+  "top_n": 10,
+  "show_days": 5,
+  "sub_min_votes": 1,
+  "comp_min_share": 0.05,
+  "comp_min_count": null,
+  "categories": {
+    "signal": {
+      "signals": [
+        "DIF_MACD(日)連續三期(1d)向上趨勢",
+        "DIF_MACD(日)連續三期(1d)向下趨勢",
+        "交叉向上(RSI(日,5),RSI(日,10))",
+        "交叉向下(RSI(日,5),RSI(日,10))",
+        "交叉向下_Kd(日)",
+        "交叉向下(RSI(週,5),RSI(週,10))",
+        "交叉向上_Kd(日)",
+        "交叉向上(RSI(週,5),RSI(週,10))",
+        "DIF_MACD(週)連續三期(5d)向上趨勢",
+        "交叉向下_Kd(週)"
+      ]
+    },
+    "status": {
+      "signals": [
+        "Kd(季)_D>77",
+        "領先指標>103",
+        "景氣燈號(黃紅燈+紅燈)",
+        "M1B_YoY>10",
+        "景氣燈號(黃紅燈+紅燈+綠燈)",
+        "CLI_G20>101",
+        "Kd(月)_D>80",
+        "RSI(季,10)_D>80",
+        "RSI(月,10)_D>80",
+        "Kd(週)_D>80"
+      ]
+    },
+    "valuation": {
+      "signals": [
+        "PB>2.3",
+        "總市值/M1B>2.1",
+        "百分位(PE,3yr)>0.9_且_PE>20",
+        "百分位(PE,3yr)>0.9",
+        "總市值/M2>0.75",
+        "百分位(PB,3yr)>0.9",
+        "總市值/GDP>1.7",
+        "百分位(PB,5yr)>=0.9",
+        "PE>25",
+        "百分位(PE,5yr)>0.95"
+      ]
+    }
+  },
+  "composite_threshold": 11.0
+}

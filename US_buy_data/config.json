@@ -1,0 +1,83 @@
+{
+  "market": "US",
+  "direction": "buy",
+  "mea": "fscore",
+  "top_n": 10,
+  "show_days": 5,
+  "sub_min_votes": 1,
+  "comp_min_share": 0.05,
+  "comp_min_count": null,
+  "categories": {
+    "other": {
+      "signals": [
+        "經濟成長率(GDP)–全年_gdp_gt_ma4",
+        "實質GDP成長率(韓國)_gdp_ge_median",
+        "德國製造業PMI_bc_mid_band",
+        "歐元區製造業PMI_bc_mid_band",
+        "法國製造業PMI_bc_mid_band",
+        "實質有效匯率指數–美國_fx_gt_ma12",
+        "德國失業率_labour_gt_ma12",
+        "臺灣非製造業NMI - 存貨觀感 - 批發業_value_ge_median",
+        "OECD領先指標(芬蘭)_bc_mid_band",
+        "名目有效匯率指數–美國_fx_gt_ma12"
+      ]
+    },
+    "index": {
+      "signals": [
+        "韓國消費者物價指數(CPI)年增率_idx_top20pct",
+        "南韓證交所市值佔GDP比重_idx_top20pct",
+        "香港證交所市值佔GDP比重_idx_top20pct",
+        "吉隆坡證交所市值佔GDP比重_idx_top20pct",
+        "綜合企業類–股價淨值比_idx_ma5_above_ma20",
+        "法國消費者物價指數(CPI)年增率_idx_top20pct",
+        "印度證交所市值佔GDP比重_idx_top20pct",
+        "多倫多證交所市值佔GDP比重_idx_top20pct",
+        "上海證交所市值佔GDP比重_idx_top20pct",
+        "韓國消費者物價指數(CPI)年增率_idx_ma5_above_ma20"
+      ]
+    },
+    "rate": {
+      "signals": [
+        "電腦及周邊設備類–殖利率_rate_top25pct",
+        "光電類–殖利率_rate_top25pct",
+        "電子類–殖利率_rate_top25pct",
+        "通信網路類–殖利率_rate_ma3_above_ma12",
+        "上櫃公司股票–殖利率_rate_ma3_above_ma12",
+        "上櫃公司股票–殖利率_rate_gt_ma12",
+        "機電類–殖利率_rate_top25pct",
+        "通信網路類–殖利率_rate_gt_ma12",
+        "上市公司股票–殖利率_rate_top25pct",
+        "電子零組件類–殖利率_rate_top25pct"
+      ]
+    },
+    "real_estate": {
+      "signals": [
+        "國泰房地產推案量戶數指數–台北市_re_mid_band",
+        "國泰房地產推案量戶數指數–新北市_re_mid_band",
+        "國泰房地產推案量戶數指數–台中市_re_mid_band",
+        "國泰房地產30天成交量指數–南高都會區_re_gt_ma12",
+        "國泰房地產30天銷售率指數–南高都會區_re_top25pct",
+        "臺灣非製造業NMI - 存貨觀感 - 營造暨不動產業_re_gt_ma12",
+        "國泰房地產推案量戶數指數–高雄市_re_gt_ma12",
+        "國泰房地產推案量戶數指數–台灣地區_re_mid_band",
+        "臺灣非製造業NMI - 存貨 - 營造暨不動產業_re_gt_ma12",
+        "國泰房地產議價空間指數–南高都會區_re_gt_ma12"
+      ]
+    },
+    "tourism": {
+      "signals": [
+        "來台旅客按目的分–俄羅斯來台探親_tour_gt_ma6",
+        "亞都麗緻大飯店客房數_tour_gt_ma6",
+        "來台旅客按目的分–澳大利亞來台觀光_tour_gt_ma6",
+        "來台旅客按目的分–新加坡來台探親_tour_gt_ma6",
+        "來台旅客按目的分–大洋洲來台觀光_tour_gt_ma6",
+        "來台旅客按目的分–紐西蘭來台觀光_tour_gt_ma6",
+        "新竹國賓大飯店住客數–GROUP類_tour_gt_ma6",
+        "知本老爺大酒店住客數–類別合計_tour_gt_ma6",
+        "寒舍艾麗酒店–類別合計_tour_gt_ma6",
+        "來台旅客按目的分–紐西蘭來台探親_tour_gt_ma6"
+      ]
+    }
+  },
+  "composite_threshold": 28.0
+}

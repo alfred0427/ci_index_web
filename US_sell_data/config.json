@@ -1,0 +1,83 @@
+{
+  "market": "US",
+  "direction": "sell",
+  "mea": "fscore",
+  "top_n": 10,
+  "show_days": 5,
+  "sub_min_votes": 1,
+  "comp_min_share": 0.05,
+  "comp_min_count": null,
+  "categories": {
+    "other": {
+      "signals": [
+        "OECD領先指標(法國六月變動)_bc_ge_median",
+        "OECD領先指標(加拿大六月變動)_bc_ge_median",
+        "OECD領先指標(整體六月變動)_bc_ge_median",
+        "OECD領先指標(英國六月變動)_bc_ge_median",
+        "OECD領先指標(G7六月變動)_bc_ge_median",
+        "OECD領先指標(美國六月變動)_bc_ge_median",
+        "OECD領先指標(希臘六月變動)_bc_ge_median",
+        "OECD領先指標(歐洲六月變動)_bc_ge_median",
+        "OECD領先指標(芬蘭六月變動)_bc_ge_median",
+        "台灣景氣對策分數_bc_ge_median"
+      ]
+    },
+    "index": {
+      "signals": [
+        "塑膠類–股價淨值比_idx_top20pct",
+        "未含金融保險類–股價淨值比_idx_top20pct",
+        "新加坡海峽時報指數(月底)_idx_top20pct",
+        "運輸類–股價淨值比_idx_top20pct",
+        "上海證交所市值佔GDP比重_idx_gt_ma6",
+        "塑膠化工類–股價淨值比_idx_top20pct",
+        "香港恆生指數(月底)_idx_top20pct",
+        "機電類–股價淨值比_idx_ma5_above_ma20",
+        "布魯塞爾BEL 20股價指數(月底)_idx_top20pct",
+        "電子類–股價淨值比_idx_ma5_above_ma20"
+      ]
+    },
+    "rate": {
+      "signals": [
+        "玻璃陶瓷類–殖利率_rate_mid_band",
+        "公債次級市場利率－十年期中央政府_rate_gt_ma12",
+        "運輸類–殖利率_rate_mid_band",
+        "公債次級市場利率－十年期中央政府_rate_ma3_above_ma12",
+        "英國基準利率_rate_gt_ma12",
+        "英國基準利率_rate_ma3_above_ma12",
+        "美國公司債Baa利率_rate_gt_ma12",
+        "美國公司債Aaa利率_rate_gt_ma12",
+        "合庫定存利率(一個月)_rate_top25pct",
+        "合庫定存利率(三個月)_rate_top25pct"
+      ]
+    },
+    "real_estate": {
+      "signals": [
+        "國泰房地產30天銷售率指數–高雄市_re_top25pct",
+        "國泰房地產30天銷售率指數–台灣地區_re_top25pct",
+        "國泰房地產推案量戶數指數–桃園市_re_gt_ma12",
+        "住宅需求調查購屋價格1200萬元以上比例–桃園市_re_top25pct",
+        "國泰房地產30天成交量指數–高雄市_re_top25pct",
+        "國泰房地產30天成交量指數–台中市_re_top25pct",
+        "臺灣非製造業NMI - 未完成訂單 - 營造暨不動產業_re_top25pct",
+        "國泰房地產議價空間指數–新竹縣市_re_top25pct",
+        "信義住宅成屋市場成交平均總價–台北縣_re_top25pct",
+        "國泰房地產30天成交量指數–新竹縣市_re_top25pct"
+      ]
+    },
+    "tourism": {
+      "signals": [
+        "第一大飯店客房數_tour_gt_ma6",
+        "觀光旅館房租收入–其他地區國際類_tour_gt_ma6",
+        "觀光旅館客房住用數–其他地區國際類_tour_gt_ma6",
+        "觀光旅館FIT類住客數–花蓮地區國際類_tour_gt_ma6",
+        "觀光旅館平均房價–台灣地區國際類合計_tour_gt_ma6",
+        "新竹老爺大酒店總營業收入_tour_ge_median",
+        "新竹老爺大酒店住客數–FIT類_tour_gt_ma6",
+        "台北寒舍艾美酒店–GROUP類_tour_gt_ma6",
+        "觀光旅館平均房價–高雄地區一般類_tour_ge_median",
+        "觀光旅館平均房價–桃竹苗地區國際類_tour_ge_median"
+      ]
+    }
+  },
+  "composite_threshold": 25.0
+}
