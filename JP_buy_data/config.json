@@ -1,0 +1,55 @@
+{
+  "market": "JP",
+  "direction": "buy",
+  "mea": "fscore",
+  "top_n": 10,
+  "show_days": 5,
+  "sub_min_votes": 1,
+  "comp_min_share": 0.05,
+  "comp_min_count": null,
+  "categories": {
+    "signal": {
+      "signals": [
+        "DIF_MACD(日)連續三期(1d)向上趨勢",
+        "DIF_MACD(日)連續三期(1d)向下趨勢",
+        "交叉向上(RSI(日,5),RSI(日,10))",
+        "交叉向上_Kd(日)",
+        "交叉向下(RSI(日,5),RSI(日,10))",
+        "交叉向下_Kd(日)",
+        "DIF_MACD(週)連續三期(5d)向下趨勢",
+        "DIF_MACD(週)連續三期(5d)向上趨勢",
+        "交叉向下(RSI(週,5),RSI(週,10))",
+        "交叉向上(RSI(週,5),RSI(週,10))"
+      ]
+    },
+    "status": {
+      "signals": [
+        "領先指標<98",
+        "CLI_G20<98",
+        "景氣燈號(藍燈)",
+        "Kd(月)_D<20",
+        "OFR_FSI > 4",
+        "收盤<MA(10yr)",
+        "景氣燈號(黃藍燈+藍燈)",
+        "PMI_TW<47",
+        "百分位數(OFR_FSI,1yr)>0.9_且_OFR_FSI>0",
+        "Kd(週)_D<20"
+      ]
+    },
+    "valuation": {
+      "signals": [
+        "百分位(PE,5yr)<=0.05",
+        "百分位(PE,3yr)<0.05_且_PE<20",
+        "百分位(PE,3yr)<0.05",
+        "PE<13",
+        "總市值/M1B<1.6",
+        "PB<1.5",
+        "百分位(PB,5yr)<=0.2",
+        "百分位(PB,3yr)<0.2",
+        "總市值/M2<0.55",
+        "總市值/月營收<0.9"
+      ]
+    }
+  },
+  "composite_threshold": 11.0
+}
