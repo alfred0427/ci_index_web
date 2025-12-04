@@ -284,4 +284,5 @@ CI Market 以最輕量的技術堆疊提供多市場多空量化監控功能：
 
 ---
 
-*Produced by CI Market Backend & Frontend System.*
+*Produced by 清大計量財金系 陳冠熏.*
+
