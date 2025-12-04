@@ -205,27 +205,34 @@ update 系統會自動寫入新帳號的資料夾。
 
 ---
 
-# ➕ 如何新增市場
 
-以新增 JP 為例：
+# ➕ 如何新增市場(以新增 JP 為例：)
 
-### ✔ Step 1：執行 init
+
+
+### ✔ Step 1：準備輸入資料
+在下列路徑建立資料夾並放入該市場的 input 檔案：
+
+data/JP/
+sn.csv
+ms.csv
+sn_dir.csv
+
+
+### ✔ Step 2：在 auto_update.ps1 新增市場代碼
+將原本的：
+
 ```
-python main.py fscore --market JP --mode init
+$markets = @('TW')
 ```
+改成：
 
-會自動產生：
 ```
-JP_buy_data/
-JP_sell_data/
+$markets = @('TW', 'JP')
 ```
-
-### ✔ Step 2：push
-前端下拉選單會自動出現 JP。
-
 ---
 
-# 📘 使用者使用教學
+# 📘 網頁使用教學
 
 ### ✔ 進入頁面（總覽）
 ```
@@ -285,5 +292,6 @@ CI Market 以最輕量的技術堆疊提供多市場多空量化監控功能：
 ---
 
 *Produced by 清大計量財金系 陳冠熏.*
+
 
 
