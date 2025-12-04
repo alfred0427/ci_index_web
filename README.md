@@ -266,7 +266,7 @@ python main.py fscore --market TW --mode update
 ### ✔ 自動更新
 執行：
 ```
-.uto_update.ps1
+.auto_update.ps1
 ```
 
 ---
@@ -285,4 +285,5 @@ CI Market 以最輕量的技術堆疊提供多市場多空量化監控功能：
 ---
 
 *Produced by 清大計量財金系 陳冠熏.*
+
 
